@@ -1,3 +1,4 @@
+# run : Rscript hw1_105753005.R {input_file_name}
 #get the file name
 args = commandArgs(trailingOnly=TRUE)
 if (length(args)==0) {
