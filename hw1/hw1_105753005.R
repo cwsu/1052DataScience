@@ -8,7 +8,7 @@ i<-1
 while(i < length(args))
 {
   if(args[i] == "-files"){
-    i_f<-args[i+1]
+    i_fName<-args[i+1]
     i<-i+1
   }else if(args[i] == "-out"){
     o_f<-args[i+1]
@@ -20,12 +20,12 @@ while(i < length(args))
 }
 
 #read an CSV file and 
-i_f <- read.csv("test.1.csv",header=TRUE)
+i_f <- read.csv(i_fName,header=TRUE)
 
 #calculate max value of weight and height
 maxW <- round(max(i_f[2]),digits=2)
 maxH <- round(max(i_f[3]),digits=2)
 
 #output a CSV file 
-data = data.frame(set = i_f, weight = maxW, height = maxH)
+data <- data.frame(set = i_fName, weight = maxW, height = maxH)
 write.csv(data , file = o_f , row.names = FALSE)
