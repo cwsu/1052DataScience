@@ -48,22 +48,24 @@ calAUC <- function(predscore, reference) {
   return (auc)
 }
 
-query_func<-function(query_m, i)
+predscore_func<-function(predscore, query_m)
 {
+  pred_score <- c()
   if(query_m == "male"){
-    which.min(i)
+    pred_score <- predscore
   }
   else if (query_m == "female") {
-    which.max(i)
+    pred_score <- (1-predscore)
   } else {
     stop(paste("ERROR: unknown query function", query_m))
   }
+  return (pred_score)
 }
 
 # read parameters
 args = commandArgs(trailingOnly=TRUE)
 if (length(args)==0) {
-  stop("USAGE: Rscript hw2_105753005.R --target male --target male --files method1.csv method2.csv method3.csv method4.csv method5.csv method6.csv method7.csv method8.csv method9.csv method10.csv --out result.csv", call.=FALSE)
+  stop("USAGE: Rscript hw2_105753005.R --target male/female --files method1.csv method2.csv method3.csv method4.csv method5.csv method6.csv method7.csv method8.csv method9.csv method10.csv --out result.csv", call.=FALSE)
 }
 
 # parse parameters
@@ -102,6 +104,7 @@ for(file in files)
 {
   method<-gsub(".csv", "", basename(file))
   d<-read.table(file, header=T,sep=",")  
+  d$pred.score <- predscore_func(d$pred.score , query_m)
   cm <- calCM(d$prediction,d$reference,query_m)
   sensitivity <- round(calSpecificity(cm),digits=2)
   specificity <- round(calSpecificity(cm),digits=2)
