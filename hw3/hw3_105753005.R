@@ -7,15 +7,15 @@ calCM <- function(predictions,references,target){
 }
 
 calSensitivity <- function(confusionMatrix){
-	return (confusionMatrix[1]/(confusionMatrix[1]+confusionMatrix[3]))
+	return (confusionMatrix[4]/(confusionMatrix[4]+confusionMatrix[1]))
 }
 
 calSpecificity <- function(confusionMatrix){
-	return (confusionMatrix[4]/(confusionMatrix[2]+confusionMatrix[4]))
+	return (confusionMatrix[2]/(confusionMatrix[2]+confusionMatrix[3]))
 }
 
 calPrecision <- function(confusionMatrix){
-	return (confusionMatrix[1]/(confusionMatrix[1]+confusionMatrix[2]))
+	return (confusionMatrix[4]/(confusionMatrix[4]+confusionMatrix[3]))
 }
 
 calF1 <- function(confusionMatrix){
@@ -25,8 +25,8 @@ calF1 <- function(confusionMatrix){
 }
 
 calAUC <- function(predscore, reference) {
-  eval <- prediction(predscore, reference)
-  auc <- attributes(performance(eval, 'auc'))$y.values[[1]]
+  evalu <- prediction(predscore, reference)
+  auc <- attributes(performance(evalu, 'auc'))$y.values[[1]]
   return (auc)
 }
 
@@ -73,7 +73,7 @@ for(file in files)
   method<-gsub(".csv", "", basename(file))
   d<-read.table(file, header=T,sep=",")  
   cm <- calCM(d$prediction,d$reference,query_m)
-  sensitivity <- round(calSpecificity(cm),digits=2)
+  sensitivity <- round(calSensitivity(cm),digits=2)
   specificity <- round(calSpecificity(cm),digits=2)
   F1 <- round(calF1(cm),digits=2)
   AUC <- round(calAUC(d$pred.score,d$reference),digits=2)
@@ -92,6 +92,7 @@ highest <- c("highest")
 for(x in c(2:5)){
 	if(x==4){
 		outDataSorted <- out_data[order(out_data[[x]]),]#get the sorted vector
+		print(outDataSorted)
 		len<-nrow(out_data)
 		maxIndex <- outDataSorted[len,1]###This is the max
 		secondMaxIndex<-outDataSorted[len-1,1]###the value smaller only than max
@@ -104,9 +105,12 @@ for(x in c(2:5)){
 		ct <- table(maxFileData$prediction, secondFileData$prediction)
 	
 		# the null hypothesis : conversion is independent of group
-		if(fisher.test(ct)$p.value>0.05){
+		print(fisher.test(ct)$p.value)
+		if(fisher.test(ct)$p.value<0.05){
 			highest <- c(highest,paste(maxIndex,"*"))
-		}
+		}else{
+			highest <- c(highest,maxIndex)
+		}		
 	}else{
 		index<-apply(out_data[x], 2, which.max)
 		highest <- c(highest,methods[index])
