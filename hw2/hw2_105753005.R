@@ -1,27 +1,10 @@
 library('ROCR')
 
 # calculate confusion matrix
-calCM <- function(predictions,references,target){ 
-	TP <- 0
-	FP <- 0
-	FN <- 0
-	TN <- 0	
-	for(x in c(1:length(predictions))){
-		if(predictions[x] == references[x] && predictions[x] == target){
-			TP <- TP+1
-		}
-		else if(predictions[x] == references[x] && predictions[x] != target){
-			TN <- TN+1
-		}
-		else if(predictions[x] != references[x] && predictions[x] == target){
-			FP <- FP+1
-		}
-		else if(predictions[x] != references[x] && predictions[x] != target){
-			FN <- FN+1
-		}
-	}
-	cm <- c(TP,FP,FN,TN)
-	return (cm)
+
+calCM <- function(predictions,references,target){
+  confusionMatrix <- table(truth = c(predictions==references), prediction = c(predictions==target))
+  return (confusionMatrix)
 }
 
 calSensitivity <- function(confusionMatrix){
