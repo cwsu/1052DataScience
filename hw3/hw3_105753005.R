@@ -70,9 +70,12 @@ AUCs <- c()
 
 for(file in files)
 {
-  method<-gsub(".csv", "", basename(file))
-  d<-read.table(file, header=T,sep=",")  
+  #method<-gsub(".csv", "", basename(file))
+  method <- file
+  d<-read.table(file, header=T,sep=",")
+  print(d)
   cm <- calCM(d$prediction,d$reference,query_m)
+  print(cm)
   sensitivity <- round(calSensitivity(cm),digits=2)
   specificity <- round(calSpecificity(cm),digits=2)
   F1 <- round(calF1(cm),digits=2)
@@ -86,38 +89,38 @@ for(file in files)
 }
 
 out_data <- data.frame(method=methods, sensitivity=sensitivitys, specificity=specificitys, F1 = F1s, AUC = AUCs, stringsAsFactors = F)
-
 #find F1 max and the second file name
 highest <- c("highest")
 for(x in c(2:5)){
 	if(x==4){
 		outDataSorted <- out_data[order(out_data[[x]]),]#get the sorted vector
-		print(outDataSorted)
 		len<-nrow(out_data)
-		maxIndex <- outDataSorted[len,1]###This is the max
-		secondMaxIndex<-outDataSorted[len-1,1]###the value smaller only than max
 		
-		maxFileName <- paste(maxIndex,".csv",sep="")	
-		maxFileData <- read.table(maxFileName, header=T, sep=",")
-		secondFileName <- paste(secondMaxIndex,".csv",sep="")
-		secondFileData <- read.table(secondFileName, header=T, sep=",")
+		maxIndexName <- outDataSorted[len,1]###This is the max
+		secondMaxIndexName<-outDataSorted[len-1,1]###the value smaller only than max		
+		
+		maxFileData <- read.table(maxIndexName, header=T, sep=",")
+		secondFileData <- read.table(secondMaxIndexName, header=T, sep=",")
 		
 		ct <- table(maxFileData$prediction, secondFileData$prediction)
 	
 		# the null hypothesis : conversion is independent of group
 		print(fisher.test(ct)$p.value)
-		if(fisher.test(ct)$p.value<0.05){
-			highest <- c(highest,paste(maxIndex,"*"))
+		maxIndexName <- gsub(".csv", "", basename(maxIndexName))
+		if(fisher.test(ct)$p.value<0.05){			
+			highest <- c(highest,paste(maxIndexName,"*",sep=""))
 		}else{
-			highest <- c(highest,maxIndex)
+			highest <- c(highest,maxIndexName)
 		}		
 	}else{
 		index<-apply(out_data[x], 2, which.max)
+		methods[index] <- gsub(".csv", "", basename(methods[index]))		
 		highest <- c(highest,methods[index])
 	}	
 }
 
 # output file
 out_data<-rbind(out_data,highest)
+out_data$method <- gsub(".csv", "", basename(out_data$method))
 write.table(out_data, file=out_f, row.names = F, sep = ",", quote = F)
 out_data
