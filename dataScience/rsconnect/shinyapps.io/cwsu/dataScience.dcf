@@ -1,0 +1,10 @@
+name: dataScience
+title:
+account: cwsu
+server: shinyapps.io
+appId: 190536
+bundleId: 873827
+url: https://cwsu.shinyapps.io/dataScience/
+when: 1497888527.37291
+asMultiple: FALSE
+asStatic: FALSE
